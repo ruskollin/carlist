@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef} from 'react';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import AddCar from './AddCar';
+import EditCar from './EditCar';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -47,6 +48,20 @@ function Carlist() {
             .catch(err => console.error(err))
          }   
 
+    const updateCar = (link,car) => {
+        fetch(link, {
+            method: 'PUT',
+            headers: {
+                'Content-type' : 'application/json'
+            },
+            body: JSON.stringify(car)
+        })
+        .then(_ => getCars())
+        .then(_ => setMsg('Edit successful'))
+        .then(_ => setOpen(true))
+        .catch(err => console.error(err))
+    }
+
    
 
     const columns = [
@@ -54,8 +69,14 @@ function Carlist() {
     {headerName: 'Model', field: 'model', sortable: true, filter: true},
     {headerName: 'Color', field: 'color', sortable: true, filter: true},
     {headerName: 'Fuel', field: 'fuel', sortable: true, filter: true},
-    {headerName: 'Year', field: 'year', sortable: true, filter: true},
+    {headerName: 'Year', field: 'year', sortable: true, filter: true, width: 130},
     {headerName: 'Price', field: 'price', sortable: true, filter: true},
+    {
+        headerName: '',
+        width: 100,
+        field: '_links.self.href',
+        cellRendererFramework: params => <EditCar updateCar={updateCar} params={params}/>
+    },
     {headerName: '', 
      field: '_links.self.href', 
      cellRendererFramework: params => <Button color="secondary" size="small" onClick={() =>deleteCar(params.value)}>Delete</Button>
